@@ -9,7 +9,7 @@ pip install -r requirements.txt
 2. In the terminal, run the **network_groupchat.py** script:
 
 ```
-python network_chat.py
+python network_groupchat.py
 ```
 
 3. Next, run the all tools scripts:
