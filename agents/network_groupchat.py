@@ -52,3 +52,7 @@ controller = autogen.ConversableAgent(
     Write everything from User Proxy as a plan.""",
     llm_config={"config_list": config_list},
 )
+
+
+groupchat = autogen.GroupChat(agents=[user_proxy, planner, controller], messages=[], max_round=12)
+manager = autogen.GroupChatManager(groupchat=groupchat, llm_config={"config_list": config_list})
