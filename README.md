@@ -6,16 +6,17 @@
 pip install -r requirements.txt
 ```
 
-2. In the terminal, run the **network_chat.py** script:
+2. In the terminal, run the **network_groupchat.py** script:
 
 ```
 python network_chat.py
 ```
 
-3. Next, run the **tools.py** script:
+3. Next, run the all tools scripts:
 
 ```
-python tools.py
+python check_interface_status.py
+
 ```
 
 4. Finally, execute the **chat_inference.py** script:
