@@ -2,12 +2,8 @@ import json
 import os
 from typing import Literal,Annotated
 import random
-import autogen
-import network_groupchat
 
-@user_proxy.register_for_execution()
-@controller.register_for_llm(description="Returns the system that has used the most CPU today.")
-def get_most_cpu() -> str:
+def get_most_cpu_impl() -> str:
     cpu_usage_data = {
         "System-A": 45.3,
         "System-B": 78.9,
