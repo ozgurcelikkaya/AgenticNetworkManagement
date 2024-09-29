@@ -5,11 +5,12 @@ import random
 import autogen
 from dotenv import load_dotenv
 from agents.utils.tools.check_interface_status import check_interface_status_impl
+from agents.utils.tools.find_device_connected_interface import find_device_connected_interface_impl
 from agents.utils.tools.get_memory_usage import get_memory_usage_impl
 from agents.utils.tools.get_most_cpu import get_most_cpu_impl
 from agents.utils.tools.is_cable_connected import is_cable_connected_impl
 from agents.utils.tools.is_firewall_pass_allowed import is_firewall_pass_allowed_impl
-from agents.utils.tools.is_port_authorized import is_port_authorized_impl ;
+from agents.utils.tools.is_interface_authorized import is_interface_authorized_impl ;
 
 load_dotenv()
 
@@ -39,10 +40,10 @@ planner = autogen.ConversableAgent(
     name="Planner",
     system_message="""You are a planner responsible for creating a detailed plan to solve tasks.
     Available Functions:
-        get_memory_usage(system_name: str) -> str
-        is_cable_connected(system_name: str) -> str
-        is_port_authorized(system_name: str, port_number: int) -> str
-        is_firewall_pass_allowed(system_name: str) -> str
+        get_memory_usage(device_name: str) -> str
+        is_cable_connected(device_name: str) -> str
+        is_port_authorized(device_name: str, port_number: int) -> str
+        is_firewall_pass_allowed(device_name: str) -> str
     Before executing any function, outline your reasoning and specify which functions to use.
     Ensure all arguments, especially device names like "Device-123", are correctly referenced and not altered.
     Only use the functions provided above.
@@ -68,34 +69,40 @@ manager = autogen.GroupChatManager(groupchat=groupchat, llm_config={"config_list
 
 @user_proxy.register_for_execution()
 @controller.register_for_llm(description="Checks whether the network interface is active or down.")
-def check_interface_status(interface: Annotated[str, "Name of the interface to check"]) -> str:
-    return check_interface_status_impl(interface)
+def check_interface_status(switch_name: Annotated[str, "Name of the switch to check"],
+                           interface: Annotated[str, "Name of the interface to check"]) -> str:
+    return check_interface_status_impl(switch_name, interface)
 
 @user_proxy.register_for_execution()
 @controller.register_for_llm(description="Retrieves the current memory usage of the system as a percentage.")
-def get_memory_usage(system_name: Annotated[str, "Name of the system to check"]) -> str:
-    return get_memory_usage_impl(system_name);
+def get_memory_usage(device_name: Annotated[str, "Name of the system to check"]) -> str:
+    return get_memory_usage_impl(device_name);
 
 @user_proxy.register_for_execution()
 @controller.register_for_llm(description="Returns the system that has used the most CPU today.")
 def get_most_cpu() -> str:
-    return get_most_cpu_impl();
+    return get_most_cpu_impl()
 
 @user_proxy.register_for_execution()
 @controller.register_for_llm(description="Checks if the cable is connected to the system.")
-def is_cable_connected(system_name: Annotated[str, "Name of the system to check"]) -> str:
-    return is_cable_connected_impl(system_name)
+def is_cable_connected(device_name: Annotated[str, "Name of the system to check"]) -> str:
+    return is_cable_connected_impl(device_name)
 
 @user_proxy.register_for_execution()
 @controller.register_for_llm(description="Checks if there is permission to pass through the firewall.")
-def is_firewall_pass_allowed(system_name: Annotated[str, "Name of the system to check"]) -> str:
-    return is_firewall_pass_allowed_impl(system_name)
+def is_firewall_pass_allowed(device_name: Annotated[str, "Name of the system to check"]) -> str:
+    return is_firewall_pass_allowed_impl(device_name)
 
 @user_proxy.register_for_execution()
-@controller.register_for_llm(description="Checks if the specified port is authorized for use.")
-def is_port_authorized(system_name: Annotated[str, "Name of the system to check"],
-                       port_number: Annotated[int, "Port number to check"]) -> str:
-    return is_port_authorized_impl(system_name, port_number);
+@controller.register_for_llm(description="Checks if the specified interface is authorized for use.")
+def is_interface_authorized(switch_name: Annotated[str, "Name of the switch to check"],
+                       interface: Annotated[int, "Interface to check"]) -> str:
+    return is_interface_authorized_impl(switch_name, interface);
+
+@user_proxy.register_for_execution()
+@controller.register_for_llm(description="Finds the last known switch interface that this device connected.")
+def find_device_connected_interface(device_name: Annotated[str, "Name of the device to check"]) -> str:
+    return find_device_connected_interface_impl(device_name)
 
 chat_result = user_proxy.initiate_chat(
     manager,
